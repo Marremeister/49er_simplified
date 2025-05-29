@@ -66,6 +66,22 @@ class SessionController:
             "equipment_settings": settings
         }
 
+    async def get_session_equipment(
+            self,
+            session_id: UUID,
+            user_id: UUID
+    ) -> Dict[str, Any]:
+        """Get equipment used in a session."""
+        equipment = await self.session_service.get_session_equipment(
+            session_id=session_id,
+            user_id=user_id
+        )
+
+        if equipment is None:
+            raise ValueError("Session not found or access denied")
+
+        return {"equipment": equipment}
+
     async def update_session(
             self,
             session_id: UUID,

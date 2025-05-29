@@ -16,10 +16,13 @@ class EquipmentRepository(IEquipmentRepository):
 
     def _to_entity(self, model: EquipmentModel) -> EquipmentEntity:
         """Convert database model to domain entity."""
+        # Handle type - it might be an enum or already a string
+        type_value = model.type.value if hasattr(model.type, 'value') else model.type
+
         return EquipmentEntity(
             id=model.id,
             name=model.name,
-            type=model.type.value,
+            type=type_value,
             manufacturer=model.manufacturer,
             model=model.model,
             purchase_date=model.purchase_date,

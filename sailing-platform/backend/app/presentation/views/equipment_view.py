@@ -23,10 +23,12 @@ class EquipmentView:
             purchase_date=equipment.purchase_date,
             notes=equipment.notes,
             active=equipment.active,
+            wear=equipment.wear,
             owner_id=equipment.owner_id,
             created_at=equipment.created_at,
             updated_at=equipment.updated_at,
-            age_in_days=equipment.age_in_days
+            age_in_days=equipment.age_in_days,
+            needs_replacement=equipment.needs_replacement()  # Using default threshold
         )
 
     @staticmethod
@@ -46,7 +48,8 @@ class EquipmentView:
             retired_equipment=stats["retired_equipment"],
             equipment_by_type=stats["equipment_by_type"],
             oldest_equipment=stats["oldest_equipment"],
-            newest_equipment=stats["newest_equipment"]
+            newest_equipment=stats["newest_equipment"],
+            most_worn_equipment=stats.get("most_worn_equipment")
         )
 
     @staticmethod

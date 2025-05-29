@@ -5,7 +5,7 @@ from datetime import date
 from uuid import UUID
 
 from app.domain.entities.session import SailingSession
-from app.domain.entities.equipment import EquipmentSettings
+from app.domain.entities.equipment import EquipmentSettings, Equipment
 from app.domain.repositories.base import IRepository
 
 
@@ -45,4 +45,9 @@ class ISessionRepository(IRepository[SailingSession]):
     @abstractmethod
     async def get_settings_by_session(self, session_id: UUID) -> Optional[EquipmentSettings]:
         """Get equipment settings for a specific session."""
+        pass
+
+    @abstractmethod
+    async def get_session_equipment(self, session_id: UUID) -> List[Equipment]:
+        """Get all equipment used in a session."""
         pass

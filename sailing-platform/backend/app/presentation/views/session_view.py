@@ -2,13 +2,15 @@
 from typing import List, Dict, Any, Optional
 
 from app.domain.entities.session import SailingSession
-from app.domain.entities.equipment import EquipmentSettings
+from app.domain.entities.equipment import EquipmentSettings, Equipment
 from app.application.schemas.session_schemas import (
     SessionResponse,
+    SessionWithEquipmentResponse,
     SessionWithSettingsResponse,
     EquipmentSettingsResponse,
     PerformanceAnalytics
 )
+from app.application.schemas.equipment_schemas import EquipmentResponse
 
 
 class SessionView:
@@ -34,6 +36,39 @@ class SessionView:
         )
 
     @staticmethod
+    def format_session_with_equipment_response(
+            session: SailingSession,
+            equipment: List[Equipment]
+    ) -> SessionWithEquipmentResponse:
+        """Format session with equipment list."""
+        session_response = SessionView.format_session_response(session)
+
+        equipment_responses = [
+            EquipmentResponse(
+                id=eq.id,
+                name=eq.name,
+                type=eq.type,
+                manufacturer=eq.manufacturer,
+                model=eq.model,
+                purchase_date=eq.purchase_date,
+                notes=eq.notes,
+                active=eq.active,
+                wear=eq.wear,
+                owner_id=eq.owner_id,
+                created_at=eq.created_at,
+                updated_at=eq.updated_at,
+                age_in_days=eq.age_in_days,
+                needs_replacement=eq.needs_replacement()
+            )
+            for eq in equipment
+        ]
+
+        return SessionWithEquipmentResponse(
+            **session_response.model_dump(),
+            equipment_used=equipment_responses
+        )
+
+    @staticmethod
     def format_sessions_list_response(sessions: List[SailingSession]) -> List[SessionResponse]:
         """Format a list of sessions."""
         return [
@@ -47,9 +82,18 @@ class SessionView:
         return EquipmentSettingsResponse(
             id=settings.id,
             session_id=settings.session_id,
+            # Rig tensions
             forestay_tension=settings.forestay_tension,
             shroud_tension=settings.shroud_tension,
             mast_rake=settings.mast_rake,
+            # New rig measurements
+            main_tension=settings.main_tension,
+            cap_tension=settings.cap_tension,
+            cap_hole=settings.cap_hole,
+            lowers_scale=settings.lowers_scale,
+            mains_scale=settings.mains_scale,
+            pre_bend=settings.pre_bend,
+            # Sail controls
             jib_halyard_tension=settings.jib_halyard_tension,
             cunningham=settings.cunningham,
             outhaul=settings.outhaul,
@@ -60,17 +104,41 @@ class SessionView:
     @staticmethod
     def format_session_with_settings_response(
             session: SailingSession,
-            settings: Optional[EquipmentSettings]
+            settings: Optional[EquipmentSettings],
+            equipment: Optional[List[Equipment]] = None
     ) -> SessionWithSettingsResponse:
         """Format session with equipment settings response."""
         session_response = SessionView.format_session_response(session)
+
+        equipment_responses = []
+        if equipment:
+            equipment_responses = [
+                EquipmentResponse(
+                    id=eq.id,
+                    name=eq.name,
+                    type=eq.type,
+                    manufacturer=eq.manufacturer,
+                    model=eq.model,
+                    purchase_date=eq.purchase_date,
+                    notes=eq.notes,
+                    active=eq.active,
+                    wear=eq.wear,
+                    owner_id=eq.owner_id,
+                    created_at=eq.created_at,
+                    updated_at=eq.updated_at,
+                    age_in_days=eq.age_in_days,
+                    needs_replacement=eq.needs_replacement()
+                )
+                for eq in equipment
+            ]
 
         return SessionWithSettingsResponse(
             **session_response.model_dump(),
             equipment_settings=(
                 SessionView.format_equipment_settings_response(settings)
                 if settings else None
-            )
+            ),
+            equipment_used=equipment_responses
         )
 
     @staticmethod

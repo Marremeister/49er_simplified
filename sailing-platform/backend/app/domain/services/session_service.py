@@ -5,15 +5,17 @@ from uuid import UUID
 from collections import defaultdict
 
 from app.domain.entities.session import SailingSession
-from app.domain.entities.equipment import EquipmentSettings
+from app.domain.entities.equipment import EquipmentSettings, Equipment
 from app.domain.repositories.session_repository import ISessionRepository
+from app.domain.repositories.equipment_repository import IEquipmentRepository
 
 
 class SessionService:
     """Domain service for sailing session business logic."""
 
-    def __init__(self, session_repository: ISessionRepository):
+    def __init__(self, session_repository: ISessionRepository, equipment_repository: IEquipmentRepository = None):
         self.session_repository = session_repository
+        self.equipment_repository = equipment_repository
 
     async def create_session(
             self,
@@ -21,6 +23,16 @@ class SessionService:
             session_data: Dict[str, Any]
     ) -> SailingSession:
         """Create a new sailing session."""
+        # Validate equipment ownership if equipment_ids provided
+        equipment_ids = session_data.get('equipment_ids', [])
+        if equipment_ids and self.equipment_repository:
+            for eq_id in equipment_ids:
+                equipment = await self.equipment_repository.get_by_id(eq_id)
+                if not equipment or equipment.owner_id != user_id:
+                    raise ValueError(f"Equipment {eq_id} not found or not owned by user")
+                if not equipment.active:
+                    raise ValueError(f"Equipment {equipment.name} is retired and cannot be used")
+
         # Create session entity
         session = SailingSession(
             created_by=user_id,
@@ -53,6 +65,19 @@ class SessionService:
             return session, settings
         return None
 
+    async def get_session_equipment(
+            self,
+            session_id: UUID,
+            user_id: UUID
+    ) -> Optional[List[Equipment]]:
+        """Get equipment used in a session."""
+        # First check if user owns the session
+        session = await self.session_repository.get_by_id(session_id)
+        if not session or session.created_by != user_id:
+            return None
+
+        return await self.session_repository.get_session_equipment(session_id)
+
     async def update_session(
             self,
             session_id: UUID,
@@ -64,6 +89,16 @@ class SessionService:
         session = await self.session_repository.get_by_id(session_id)
         if not session or session.created_by != user_id:
             return None
+
+        # Validate new equipment if provided
+        equipment_ids = update_data.get('equipment_ids')
+        if equipment_ids is not None and self.equipment_repository:
+            for eq_id in equipment_ids:
+                equipment = await self.equipment_repository.get_by_id(eq_id)
+                if not equipment or equipment.owner_id != user_id:
+                    raise ValueError(f"Equipment {eq_id} not found or not owned by user")
+                if not equipment.active:
+                    raise ValueError(f"Equipment {equipment.name} is retired and cannot be used")
 
         # Update session
         session.update(**update_data)
@@ -131,7 +166,8 @@ class SessionService:
                 "total_hours": 0,
                 "average_performance": 0,
                 "performance_by_conditions": {},
-                "sessions_by_location": {}
+                "sessions_by_location": {},
+                "equipment_usage": {}
             }
 
         # Calculate analytics
@@ -158,10 +194,20 @@ class SessionService:
         for session in sessions:
             sessions_by_location[session.location] += 1
 
+        # Equipment usage statistics
+        equipment_usage = defaultdict(int)
+        if self.equipment_repository:
+            for session in sessions:
+                for eq_id in session.equipment_ids:
+                    equipment = await self.equipment_repository.get_by_id(eq_id)
+                    if equipment:
+                        equipment_usage[f"{equipment.name} ({equipment.type})"] += 1
+
         return {
             "total_sessions": len(sessions),
             "total_hours": round(total_hours, 1),
             "average_performance": round(avg_performance, 2),
             "performance_by_conditions": performance_by_conditions,
-            "sessions_by_location": dict(sessions_by_location)
+            "sessions_by_location": dict(sessions_by_location),
+            "equipment_usage": dict(equipment_usage)
         }

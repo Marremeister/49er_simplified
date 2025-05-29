@@ -1,6 +1,6 @@
 """Sailing session domain entity with business logic."""
 from datetime import date, datetime, timezone
-from typing import Optional, Literal
+from typing import Optional, Literal, List
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
 
@@ -22,6 +22,7 @@ class SailingSession:
     performance_rating: int
     created_by: UUID
     notes: Optional[str] = None
+    equipment_ids: List[UUID] = field(default_factory=list)  # Equipment used in this session
     id: UUID = field(default_factory=uuid4)
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
@@ -79,6 +80,18 @@ class SailingSession:
     def is_light_weather(self) -> bool:
         """Check if session was in light weather conditions."""
         return self.average_wind_speed < 8 and self.wave_type in ["Flat", "Choppy"]
+
+    def add_equipment(self, equipment_id: UUID) -> None:
+        """Add equipment to the session."""
+        if equipment_id not in self.equipment_ids:
+            self.equipment_ids.append(equipment_id)
+            self.updated_at = datetime.now(timezone.utc)
+
+    def remove_equipment(self, equipment_id: UUID) -> None:
+        """Remove equipment from the session."""
+        if equipment_id in self.equipment_ids:
+            self.equipment_ids.remove(equipment_id)
+            self.updated_at = datetime.now(timezone.utc)
 
     def update(self, **kwargs) -> None:
         """Update session with validation."""

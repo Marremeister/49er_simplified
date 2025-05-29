@@ -13,11 +13,13 @@ from app.application.schemas.session_schemas import (
     SessionCreate,
     SessionUpdate,
     SessionResponse,
+    SessionWithEquipmentResponse,
     SessionWithSettingsResponse,
     EquipmentSettingsCreate,
     EquipmentSettingsResponse,
     PerformanceAnalytics
 )
+from app.application.schemas.equipment_schemas import EquipmentResponse
 
 router = APIRouter()
 
@@ -88,10 +90,55 @@ async def get_session(
 
     try:
         result = await controller.get_session_with_settings(session_id, current_user_id)
+        # Also get equipment for the session
+        equipment_result = await controller.get_session_equipment(session_id, current_user_id)
+
         return view.format_session_with_settings_response(
             result["session"],
-            result["equipment_settings"]
+            result["equipment_settings"],
+            equipment_result.get("equipment", [])
         )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+
+
+@router.get("/{session_id}/equipment", response_model=List[EquipmentResponse])
+async def get_session_equipment(
+        session_id: UUID,
+        current_user_id: Annotated[UUID, Depends(get_current_user_id)],
+        session_service: Annotated[SessionService, Depends(get_session_service)]
+):
+    """Get equipment used in a specific session."""
+    controller = SessionController(session_service)
+    view = SessionView()
+
+    try:
+        result = await controller.get_session_equipment(session_id, current_user_id)
+        equipment_list = result["equipment"]
+
+        # Format equipment responses
+        return [
+            EquipmentResponse(
+                id=eq.id,
+                name=eq.name,
+                type=eq.type,
+                manufacturer=eq.manufacturer,
+                model=eq.model,
+                purchase_date=eq.purchase_date,
+                notes=eq.notes,
+                active=eq.active,
+                wear=eq.wear,
+                owner_id=eq.owner_id,
+                created_at=eq.created_at,
+                updated_at=eq.updated_at,
+                age_in_days=eq.age_in_days,
+                needs_replacement=eq.needs_replacement()
+            )
+            for eq in equipment_list
+        ]
     except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -4,7 +4,7 @@ from typing import Optional, Literal
 from uuid import UUID
 from pydantic import BaseModel, Field, ConfigDict
 
-EquipmentType = Literal["Mainsail", "Jib", "Mast", "Boom", "Rudder", "Centerboard", "Other"]
+EquipmentType = Literal["Mainsail", "Jib", "Gennaker", "Mast", "Boom", "Rudder", "Centerboard", "Other"]
 
 
 class EquipmentBase(BaseModel):
@@ -36,10 +36,12 @@ class EquipmentResponse(EquipmentBase):
     """Equipment response schema."""
     id: UUID
     active: bool
+    wear: float = Field(..., description="Total hours of use")
     owner_id: UUID
     created_at: datetime
     updated_at: datetime
     age_in_days: Optional[int] = None
+    needs_replacement: Optional[bool] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -52,3 +54,4 @@ class EquipmentStatistics(BaseModel):
     equipment_by_type: dict[str, int]
     oldest_equipment: Optional[str]
     newest_equipment: Optional[str]
+    most_worn_equipment: Optional[dict[str, float]] = None  # name: wear_hours

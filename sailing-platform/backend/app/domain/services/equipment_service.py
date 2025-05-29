@@ -109,6 +109,24 @@ class EquipmentService:
 
         return await self.equipment_repository.delete(equipment_id)
 
+    async def add_wear_to_equipment(
+            self,
+            equipment_id: UUID,
+            hours: float,
+            user_id: UUID
+    ) -> Optional[Equipment]:
+        """Add wear hours to equipment."""
+        # Get equipment
+        equipment = await self.equipment_repository.get_by_id(equipment_id)
+        if not equipment or equipment.owner_id != user_id:
+            return None
+
+        # Add wear
+        equipment.add_wear(hours)
+
+        # Save changes
+        return await self.equipment_repository.update(equipment)
+
     async def get_equipment_statistics(
             self,
             user_id: UUID
@@ -123,7 +141,8 @@ class EquipmentService:
                 "retired_equipment": 0,
                 "equipment_by_type": {},
                 "oldest_equipment": None,
-                "newest_equipment": None
+                "newest_equipment": None,
+                "most_worn_equipment": None
             }
 
         # Calculate statistics
@@ -141,11 +160,21 @@ class EquipmentService:
             key=lambda e: e.purchase_date
         )
 
+        # Find most worn equipment (top 3)
+        sorted_by_wear = sorted(
+            [e for e in all_equipment if e.wear > 0],
+            key=lambda e: e.wear,
+            reverse=True
+        )[:3]
+
+        most_worn = {e.name: e.wear for e in sorted_by_wear} if sorted_by_wear else None
+
         return {
             "total_equipment": len(all_equipment),
             "active_equipment": active_count,
             "retired_equipment": retired_count,
             "equipment_by_type": dict(by_type),
             "oldest_equipment": sorted_by_date[0].name if sorted_by_date else None,
-            "newest_equipment": sorted_by_date[-1].name if sorted_by_date else None
+            "newest_equipment": sorted_by_date[-1].name if sorted_by_date else None,
+            "most_worn_equipment": most_worn
         }

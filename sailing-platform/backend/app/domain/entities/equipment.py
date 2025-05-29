@@ -5,7 +5,7 @@ from uuid import UUID, uuid4
 from dataclasses import dataclass, field
 
 
-EquipmentType = Literal["Mainsail", "Jib", "Gennacker", "Mast", "Boom", "Rudder", "Centerboard", "Other"]
+EquipmentType = Literal["Mainsail", "Jib", "Gennaker", "Mast", "Boom", "Rudder", "Centerboard", "Other"]
 TensionLevel = Literal["Loose", "Medium", "Tight"]
 
 
@@ -21,6 +21,7 @@ class Equipment:
     purchase_date: Optional[date] = None
     notes: Optional[str] = None
     active: bool = True
+    wear: float = 0.0  # Total hours of use
     id: UUID = field(default_factory=uuid4)
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
@@ -29,6 +30,7 @@ class Equipment:
         """Validate equipment data after initialization."""
         self._validate_name()
         self._validate_type()
+        self._validate_wear()
 
     def _validate_name(self) -> None:
         """Validate equipment name."""
@@ -39,9 +41,14 @@ class Equipment:
 
     def _validate_type(self) -> None:
         """Validate equipment type."""
-        valid_types = ["Mainsail", "Jib", "Mast", "Boom", "Rudder", "Centerboard", "Other"]
+        valid_types = ["Mainsail", "Jib", "Gennaker", "Mast", "Boom", "Rudder", "Centerboard", "Other"]
         if self.type not in valid_types:
             raise ValueError(f"Equipment type must be one of: {', '.join(valid_types)}")
+
+    def _validate_wear(self) -> None:
+        """Validate wear value."""
+        if self.wear < 0:
+            raise ValueError("Wear cannot be negative")
 
     def retire(self) -> None:
         """Retire the equipment."""
@@ -51,6 +58,13 @@ class Equipment:
     def reactivate(self) -> None:
         """Reactivate retired equipment."""
         self.active = True
+        self.updated_at = datetime.now(timezone.utc)
+
+    def add_wear(self, hours: float) -> None:
+        """Add wear hours to equipment."""
+        if hours < 0:
+            raise ValueError("Cannot add negative wear hours")
+        self.wear += hours
         self.updated_at = datetime.now(timezone.utc)
 
     @property
@@ -65,19 +79,36 @@ class Equipment:
         age = self.age_in_days
         return age is not None and age > threshold_days
 
+    def needs_replacement(self, wear_threshold: float = 500.0) -> bool:
+        """Check if equipment needs replacement based on wear."""
+        return self.wear > wear_threshold
+
 
 @dataclass
 class EquipmentSettings:
     """Equipment settings for a specific sailing session."""
 
     session_id: UUID
-    forestay_tension: float  # 0-10 scale
-    shroud_tension: float    # 0-10 scale
-    mast_rake: float         # degrees
+
+    # Rig tensions
+    forestay_tension: float      # 0-10 scale
+    shroud_tension: float        # 0-10 scale (lower tension)
+    mast_rake: float            # degrees
+
+    # Sail controls
     jib_halyard_tension: TensionLevel
-    cunningham: float        # 0-10 scale
-    outhaul: float          # 0-10 scale
-    vang: float             # 0-10 scale
+    cunningham: float           # 0-10 scale
+    outhaul: float             # 0-10 scale
+    vang: float                # 0-10 scale
+
+    # New rig measurements
+    main_tension: float = 0.0  # 0-10 scale
+    cap_tension: float = 0.0  # 0-10 scale
+    cap_hole: float = 0.0  # hole number or measurement
+    lowers_scale: float = 0.0  # 0-10 scale
+    mains_scale: float = 0.0  # 0-10 scale
+    pre_bend: float = 0.0  # mm or inches
+
     id: UUID = field(default_factory=uuid4)
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -91,6 +122,10 @@ class EquipmentSettings:
         tension_fields = [
             ('forestay_tension', self.forestay_tension),
             ('shroud_tension', self.shroud_tension),
+            ('main_tension', self.main_tension),
+            ('cap_tension', self.cap_tension),
+            ('lowers_scale', self.lowers_scale),
+            ('mains_scale', self.mains_scale),
             ('cunningham', self.cunningham),
             ('outhaul', self.outhaul),
             ('vang', self.vang)
@@ -99,6 +134,14 @@ class EquipmentSettings:
         for field_name, value in tension_fields:
             if not 0 <= value <= 10:
                 raise ValueError(f"{field_name} must be between 0 and 10")
+
+        # Validate cap_hole separately as it might have different range
+        if self.cap_hole < 0:
+            raise ValueError("cap_hole cannot be negative")
+
+        # Validate pre_bend
+        if not -50 <= self.pre_bend <= 200:  # Reasonable range in mm
+            raise ValueError("pre_bend must be between -50 and 200 mm")
 
         valid_halyard_tensions = ["Loose", "Medium", "Tight"]
         if self.jib_halyard_tension not in valid_halyard_tensions:
@@ -115,7 +158,8 @@ class EquipmentSettings:
         return (
             self.forestay_tension > 7 and
             self.cunningham > 6 and
-            self.vang > 7
+            self.vang > 7 and
+            self.main_tension > 6
         )
 
     @property
@@ -124,5 +168,6 @@ class EquipmentSettings:
         return (
             self.forestay_tension < 4 and
             self.cunningham < 3 and
-            self.jib_halyard_tension == "Loose"
+            self.jib_halyard_tension == "Loose" and
+            self.main_tension < 3
         )
