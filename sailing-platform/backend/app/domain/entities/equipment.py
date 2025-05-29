@@ -5,7 +5,7 @@ from uuid import UUID, uuid4
 from dataclasses import dataclass, field
 
 
-EquipmentType = Literal["Mainsail", "Jib", "Mast", "Boom", "Rudder", "Centerboard", "Other"]
+EquipmentType = Literal["Mainsail", "Jib", "Gennacker", "Mast", "Boom", "Rudder", "Centerboard", "Other"]
 TensionLevel = Literal["Loose", "Medium", "Tight"]
 
 

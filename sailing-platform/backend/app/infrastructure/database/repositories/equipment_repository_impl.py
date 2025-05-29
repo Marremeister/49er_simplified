@@ -1,4 +1,3 @@
-"""Equipment repository implementation using SQLAlchemy."""
 from typing import List, Optional
 from uuid import UUID
 from sqlalchemy import select, and_
@@ -26,6 +25,7 @@ class EquipmentRepository(IEquipmentRepository):
             purchase_date=model.purchase_date,
             notes=model.notes,
             active=model.active,
+            wear=model.wear,
             owner_id=model.owner_id,
             created_at=model.created_at,
             updated_at=model.updated_at
@@ -42,6 +42,7 @@ class EquipmentRepository(IEquipmentRepository):
             purchase_date=entity.purchase_date,
             notes=entity.notes,
             active=entity.active,
+            wear=entity.wear,
             owner_id=entity.owner_id,
             created_at=entity.created_at,
             updated_at=entity.updated_at
@@ -71,7 +72,6 @@ class EquipmentRepository(IEquipmentRepository):
         if not model:
             raise ValueError("Equipment not found")
 
-        # Update fields
         model.name = entity.name
         model.type = entity.type
         model.manufacturer = entity.manufacturer
@@ -79,6 +79,7 @@ class EquipmentRepository(IEquipmentRepository):
         model.purchase_date = entity.purchase_date
         model.notes = entity.notes
         model.active = entity.active
+        model.wear = entity.wear
         model.updated_at = entity.updated_at
 
         await self.session.flush()
@@ -103,7 +104,7 @@ class EquipmentRepository(IEquipmentRepository):
         stmt = select(EquipmentModel).offset(skip).limit(limit).order_by(EquipmentModel.created_at.desc())
         result = await self.session.execute(stmt)
         models = result.scalars().all()
-        return [self._to_entity(model) for model in models]
+        return [self._to_entity(m) for m in models]
 
     async def get_by_user(self, user_id: UUID, active_only: bool = True) -> List[EquipmentEntity]:
         """Get all equipment for a specific user."""
@@ -113,8 +114,7 @@ class EquipmentRepository(IEquipmentRepository):
 
         stmt = select(EquipmentModel).where(and_(*conditions)).order_by(EquipmentModel.name)
         result = await self.session.execute(stmt)
-        models = result.scalars().all()
-        return [self._to_entity(model) for model in models]
+        return [self._to_entity(m) for m in result.scalars().all()]
 
     async def get_by_type(self, user_id: UUID, equipment_type: EquipmentType) -> List[EquipmentEntity]:
         """Get equipment by type for a user."""
@@ -129,8 +129,7 @@ class EquipmentRepository(IEquipmentRepository):
             .order_by(EquipmentModel.name)
         )
         result = await self.session.execute(stmt)
-        models = result.scalars().all()
-        return [self._to_entity(model) for model in models]
+        return [self._to_entity(m) for m in result.scalars().all()]
 
     async def retire(self, equipment_id: UUID) -> bool:
         """Retire equipment by ID."""
