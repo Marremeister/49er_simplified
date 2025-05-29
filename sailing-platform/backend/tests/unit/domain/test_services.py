@@ -2,6 +2,7 @@
 import pytest
 from unittest.mock import AsyncMock
 from uuid import uuid4
+from datetime import date
 
 from app.domain.services.auth_service import AuthService
 from app.domain.services.session_service import SessionService
@@ -183,7 +184,7 @@ class TestSessionService:
         # Setup
         user_id = uuid4()
         session_data = {
-            "date": "2024-01-15",
+            "date": date(2024, 1, 15),
             "location": "SF Bay",
             "wind_speed_min": 10.0,
             "wind_speed_max": 15.0,
@@ -292,7 +293,7 @@ class TestSessionService:
         sessions = [
             SailingSession(
                 id=uuid4(),
-                date="2024-01-15",
+                date=date(2024, 1, 15),
                 location="SF Bay",
                 wind_speed_min=20,
                 wind_speed_max=25,
@@ -304,7 +305,7 @@ class TestSessionService:
             ),
             SailingSession(
                 id=uuid4(),
-                date="2024-01-16",
+                date=date(2024, 1, 16),
                 location="SF Bay",
                 wind_speed_min=5,
                 wind_speed_max=8,
@@ -316,7 +317,7 @@ class TestSessionService:
             ),
             SailingSession(
                 id=uuid4(),
-                date="2024-01-17",
+                date=date(2024, 1, 17),
                 location="Berkeley",
                 wind_speed_min=12,
                 wind_speed_max=15,
@@ -359,7 +360,7 @@ class TestEquipmentService:
             "type": "Mainsail",
             "manufacturer": "North Sails",
             "model": "3Di",
-            "purchase_date": "2024-01-01"
+            "purchase_date": date(2024, 1, 1)
         }
 
         expected_equipment = Equipment(
@@ -429,7 +430,7 @@ class TestEquipmentService:
                 model="3Di",
                 owner_id=user_id,
                 active=True,
-                purchase_date="2023-01-01"
+                purchase_date=date(2023, 1, 1)
             ),
             Equipment(
                 id=uuid4(),
@@ -439,7 +440,7 @@ class TestEquipmentService:
                 model="Stratis",
                 owner_id=user_id,
                 active=False,
-                purchase_date="2020-01-01"
+                purchase_date=date(2020, 1, 1)
             ),
             Equipment(
                 id=uuid4(),
@@ -449,7 +450,7 @@ class TestEquipmentService:
                 model="3Di",
                 owner_id=user_id,
                 active=True,
-                purchase_date="2024-01-01"
+                purchase_date=date(2024, 1, 1)
             )
         ]
 

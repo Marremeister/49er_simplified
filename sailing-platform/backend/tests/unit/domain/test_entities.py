@@ -362,8 +362,8 @@ class TestEquipmentSettingsEntity:
 
         assert settings.forestay_tension == 7.5
         assert settings.jib_halyard_tension == "Medium"
-        assert settings.is_heavy_weather_setup() is False
-        assert settings.is_light_weather_setup() is False
+        assert settings.is_heavy_weather_setup is False
+        assert settings.is_light_weather_setup is False
 
     def test_settings_tension_validation(self):
         """Test tension value validation."""
@@ -434,8 +434,8 @@ class TestEquipmentSettingsEntity:
             outhaul=8.0,
             vang=8.5
         )
-        assert heavy_settings.is_heavy_weather_setup() is True
-        assert heavy_settings.is_light_weather_setup() is False
+        assert heavy_settings.is_heavy_weather_setup is True
+        assert heavy_settings.is_light_weather_setup is False
 
         # Light weather setup
         light_settings = EquipmentSettings(
@@ -448,5 +448,5 @@ class TestEquipmentSettingsEntity:
             outhaul=3.0,
             vang=2.5
         )
-        assert light_settings.is_heavy_weather_setup() is False
-        assert light_settings.is_light_weather_setup() is True
+        assert light_settings.is_heavy_weather_setup is False
+        assert light_settings.is_light_weather_setup is True

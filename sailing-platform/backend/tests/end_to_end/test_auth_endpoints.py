@@ -1,13 +1,14 @@
 """End-to-end tests for authentication endpoints."""
 import pytest
-from httpx import AsyncClient
+import pytest_asyncio
+from httpx import AsyncClient, ASGITransport
 from fastapi import status
 
 from app.main import app
 from app.infrastructure.database.connection import engine, Base
 
 
-@pytest.fixture(scope="module")
+@pytest_asyncio.fixture
 async def setup_database():
     """Setup test database."""
     async with engine.begin() as conn:
@@ -23,7 +24,8 @@ class TestAuthEndpoints:
 
     async def test_register_user_success(self, setup_database):
         """Test successful user registration."""
-        async with AsyncClient(app=app, base_url="http://test") as client:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
             response = await client.post(
                 "/api/auth/register",
                 json={
@@ -44,7 +46,8 @@ class TestAuthEndpoints:
 
     async def test_register_user_duplicate_email(self, setup_database):
         """Test registration with duplicate email."""
-        async with AsyncClient(app=app, base_url="http://test") as client:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
             # First registration
             await client.post(
                 "/api/auth/register",
@@ -70,7 +73,8 @@ class TestAuthEndpoints:
 
     async def test_register_user_duplicate_username(self, setup_database):
         """Test registration with duplicate username."""
-        async with AsyncClient(app=app, base_url="http://test") as client:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
             # First registration
             await client.post(
                 "/api/auth/register",
@@ -96,7 +100,8 @@ class TestAuthEndpoints:
 
     async def test_register_user_invalid_data(self, setup_database):
         """Test registration with invalid data."""
-        async with AsyncClient(app=app, base_url="http://test") as client:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
             # Invalid email
             response = await client.post(
                 "/api/auth/register",
@@ -132,7 +137,8 @@ class TestAuthEndpoints:
 
     async def test_login_success(self, setup_database):
         """Test successful login."""
-        async with AsyncClient(app=app, base_url="http://test") as client:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
             # Register user
             await client.post(
                 "/api/auth/register",
@@ -159,7 +165,8 @@ class TestAuthEndpoints:
 
     async def test_login_oauth2_form(self, setup_database):
         """Test login with OAuth2 form data."""
-        async with AsyncClient(app=app, base_url="http://test") as client:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
             # Register user
             await client.post(
                 "/api/auth/register",
@@ -186,7 +193,8 @@ class TestAuthEndpoints:
 
     async def test_login_invalid_credentials(self, setup_database):
         """Test login with invalid credentials."""
-        async with AsyncClient(app=app, base_url="http://test") as client:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
             # Register user
             await client.post(
                 "/api/auth/register",
@@ -222,7 +230,8 @@ class TestAuthEndpoints:
 
     async def test_get_current_user(self, setup_database):
         """Test getting current user information."""
-        async with AsyncClient(app=app, base_url="http://test") as client:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
             # Register and login
             register_response = await client.post(
                 "/api/auth/register",
@@ -249,7 +258,8 @@ class TestAuthEndpoints:
 
     async def test_get_current_user_invalid_token(self, setup_database):
         """Test getting current user with invalid token."""
-        async with AsyncClient(app=app, base_url="http://test") as client:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
             # Invalid token
             response = await client.get(
                 "/api/auth/me",
@@ -264,7 +274,8 @@ class TestAuthEndpoints:
 
     async def test_verify_token(self, setup_database):
         """Test token verification endpoint."""
-        async with AsyncClient(app=app, base_url="http://test") as client:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
             # Register and get token
             register_response = await client.post(
                 "/api/auth/register",
@@ -290,7 +301,8 @@ class TestAuthEndpoints:
 
     async def test_full_auth_flow(self, setup_database):
         """Test complete authentication flow."""
-        async with AsyncClient(app=app, base_url="http://test") as client:
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as client:
             # 1. Register
             register_response = await client.post(
                 "/api/auth/register",

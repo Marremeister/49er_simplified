@@ -1,5 +1,5 @@
 """User domain entity with business logic."""
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
@@ -14,7 +14,7 @@ class User:
     hashed_password: str
     is_active: bool = True
     id: UUID = field(default_factory=uuid4)
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
     def __post_init__(self):
         """Validate user data after initialization."""

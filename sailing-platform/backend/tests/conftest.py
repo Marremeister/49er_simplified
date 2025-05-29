@@ -1,5 +1,6 @@
 """PyTest configuration and fixtures."""
 import asyncio
+from datetime import date
 from typing import AsyncGenerator
 from unittest.mock import AsyncMock
 from uuid import uuid4
@@ -17,16 +18,9 @@ from app.domain.repositories.equipment_repository import IEquipmentRepository
 from app.infrastructure.database.connection import Base
 from app.infrastructure.security.password_hasher import PasswordHasher
 
+
 # Configure pytest-asyncio
 pytest_plugins = ('pytest_asyncio',)
-
-
-@pytest.fixture(scope="session")
-def event_loop():
-    """Create an instance of the default event loop for the test session."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
 
 
 # Mock repositories
@@ -75,7 +69,7 @@ def sample_session():
     """Sample sailing session for tests."""
     return SailingSession(
         id=uuid4(),
-        date="2024-01-15",
+        date=date(2024, 1, 15),
         location="San Francisco Bay",
         wind_speed_min=10.0,
         wind_speed_max=15.0,
@@ -97,7 +91,7 @@ def sample_equipment():
         type="Mainsail",
         manufacturer="North Sails",
         model="3Di RAW 760",
-        purchase_date="2023-06-01",
+        purchase_date=date(2023, 6, 1),
         notes="Race sail",
         active=True,
         owner_id=uuid4()

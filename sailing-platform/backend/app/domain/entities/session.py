@@ -1,8 +1,9 @@
 """Sailing session domain entity with business logic."""
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from typing import Optional, Literal
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
+
 
 WaveType = Literal["Flat", "Choppy", "Medium", "Large"]
 
@@ -22,8 +23,8 @@ class SailingSession:
     created_by: UUID
     notes: Optional[str] = None
     id: UUID = field(default_factory=uuid4)
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    updated_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
     def __post_init__(self):
         """Validate session data after initialization."""
@@ -91,7 +92,7 @@ class SailingSession:
         # Validate
         try:
             self.__post_init__()
-            self.updated_at = datetime.utcnow()
+            self.updated_at = datetime.now(timezone.utc)
         except ValueError:
             # Rollback on validation error
             for key, value in old_values.items():

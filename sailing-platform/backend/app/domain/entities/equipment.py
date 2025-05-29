@@ -1,8 +1,9 @@
 """Equipment domain entities with business logic."""
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from typing import Optional, Literal
 from uuid import UUID, uuid4
 from dataclasses import dataclass, field
+
 
 EquipmentType = Literal["Mainsail", "Jib", "Mast", "Boom", "Rudder", "Centerboard", "Other"]
 TensionLevel = Literal["Loose", "Medium", "Tight"]
@@ -21,8 +22,8 @@ class Equipment:
     notes: Optional[str] = None
     active: bool = True
     id: UUID = field(default_factory=uuid4)
-    created_at: datetime = field(default_factory=datetime.utcnow)
-    updated_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
     def __post_init__(self):
         """Validate equipment data after initialization."""
@@ -45,12 +46,12 @@ class Equipment:
     def retire(self) -> None:
         """Retire the equipment."""
         self.active = False
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(timezone.utc)
 
     def reactivate(self) -> None:
         """Reactivate retired equipment."""
         self.active = True
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(timezone.utc)
 
     @property
     def age_in_days(self) -> Optional[int]:
@@ -71,14 +72,14 @@ class EquipmentSettings:
 
     session_id: UUID
     forestay_tension: float  # 0-10 scale
-    shroud_tension: float  # 0-10 scale
-    mast_rake: float  # degrees
+    shroud_tension: float    # 0-10 scale
+    mast_rake: float         # degrees
     jib_halyard_tension: TensionLevel
-    cunningham: float  # 0-10 scale
-    outhaul: float  # 0-10 scale
-    vang: float  # 0-10 scale
+    cunningham: float        # 0-10 scale
+    outhaul: float          # 0-10 scale
+    vang: float             # 0-10 scale
     id: UUID = field(default_factory=uuid4)
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
     def __post_init__(self):
         """Validate settings data after initialization."""
@@ -112,16 +113,16 @@ class EquipmentSettings:
     def is_heavy_weather_setup(self) -> bool:
         """Check if settings indicate heavy weather setup."""
         return (
-                self.forestay_tension > 7 and
-                self.cunningham > 6 and
-                self.vang > 7
+            self.forestay_tension > 7 and
+            self.cunningham > 6 and
+            self.vang > 7
         )
 
     @property
     def is_light_weather_setup(self) -> bool:
         """Check if settings indicate light weather setup."""
         return (
-                self.forestay_tension < 4 and
-                self.cunningham < 3 and
-                self.jib_halyard_tension == "Loose"
+            self.forestay_tension < 4 and
+            self.cunningham < 3 and
+            self.jib_halyard_tension == "Loose"
         )
