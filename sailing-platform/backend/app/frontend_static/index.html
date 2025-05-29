@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sailing Platform</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>49er Sailing Platform</h1>
+        <nav id="main-nav" style="display: none;">
+            <a href="#dashboard">Dashboard</a>
+            <a href="#equipment">Equipment</a> <a href="#" id="logout-button">Logout</a>
+        </nav>
+    </header>
+
+    <main id="app-content">
+        <section id="login-view">
+            <h2>Login</h2>
+            <form id="login-form">
+                <div>
+                    <label for="login-username">Username:</label>
+                    <input type="text" id="login-username" value="admin" required>
+                </div>
+                <div>
+                    <label for="login-password">Password:</label>
+                    <input type="password" id="login-password" value="admin123" required>
+                </div>
+                <button type="submit">Login</button>
+                <p>Don't have an account? <a href="#register">Register here</a></p>
+            </form>
+        </section>
+
+        <section id="register-view" style="display: none;">
+            <h2>Register</h2>
+            <form id="register-form">
+                <div><label>Email: <input type="email" id="register-email" required></label></div>
+                <div><label>Username: <input type="text" id="register-username" required></label></div>
+                <div><label>Password: <input type="password" id="register-password" required></label></div>
+                <button type="submit">Register</button>
+                <p>Already have an account? <a href="#login">Login here</a></p>
+            </form>
+        </section>
+
+        <section id="dashboard-view" style="display: none;">
+            <div class="view-header">
+                <h2>My Sailing Sessions</h2>
+                <button id="show-create-session-form-button" class="btn-primary">Log New Session</button>
+            </div>
+
+            <div id="session-form-modal" class="modal" style="display:none;">
+                <div class="modal-content">
+                    <span class="close-button" id="close-session-form-button">&times;</span>
+                    <h3 id="session-form-title">Log New Session</h3>
+                    <form id="session-form">
+                        <input type="hidden" name="id" id="session-id"> <div><label>Date: <input type="date" name="date" id="session-date" required></label></div>
+                        <div><label>Location: <input type="text" name="location" id="session-location" required></label></div>
+                        <div><label>Min Wind (knots): <input type="number" step="0.1" name="wind_speed_min" id="session-wind-min"></label></div>
+                        <div><label>Max Wind (knots): <input type="number" step="0.1" name="wind_speed_max" id="session-wind-max"></label></div>
+                        <div>
+                            <label>Wave Type:
+                                <select name="wave_type" id="session-wave-type">
+                                    </select>
+                            </label>
+                        </div>
+                        <div><label>Wave Direction: <input type="text" name="wave_direction" id="session-wave-direction"></label></div>
+                        <div><label>Hours on Water: <input type="number" step="0.1" name="hours_on_water" id="session-hours"></label></div>
+                        <div><label>Performance (1-5): <input type="number" min="1" max="5" name="performance_rating" id="session-performance"></label></div>
+                        <div><label>Notes: <textarea name="notes" id="session-notes"></textarea></label></div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Save Session</button>
+                            <button type="button" id="cancel-session-form-button" class="btn-secondary">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="sessions-list-container">
+                <p id="loading-sessions" style="display:none;">Loading sessions...</p>
+                <div id="sessions-list">
+                    </div>
+            </div>
+        </section>
+
+        <section id="equipment-view" style="display: none;">
+            <h2>My Equipment</h2>
+            <p>Equipment management coming soon!</p>
+            </section>
+
+    </main>
+    <footer><p>&copy; 2025 Sailing Platform</p></footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/sessions.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

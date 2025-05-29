@@ -31,10 +31,17 @@ app = FastAPI(
 )
 
 # Set up CORS
+# Set up CORS
 if settings.BACKEND_CORS_ORIGINS:
+    # Handle both list and string formats
+    if isinstance(settings.BACKEND_CORS_ORIGINS, str):
+        origins = [origin.strip() for origin in settings.BACKEND_CORS_ORIGINS.split(",")]
+    else:
+        origins = [str(origin).strip('"').strip("'") for origin in settings.BACKEND_CORS_ORIGINS]
+
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_origins=origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
