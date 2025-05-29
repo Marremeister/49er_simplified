@@ -3,8 +3,8 @@ from abc import abstractmethod
 from typing import List
 from uuid import UUID
 
-from backend.app.domain.entities.equipment import Equipment, EquipmentType
-from backend.app.domain.repositories.base import IRepository
+from app.domain.entities.equipment import Equipment, EquipmentType
+from app.domain.repositories.base import IRepository
 
 
 class IEquipmentRepository(IRepository[Equipment]):

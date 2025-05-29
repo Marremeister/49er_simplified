@@ -2,7 +2,7 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base
 
-from backend.app.config import settings
+from app.config import settings
 
 # Create async engine
 engine = create_async_engine(
@@ -39,7 +39,7 @@ async def create_tables():
     """Create all database tables."""
     async with engine.begin() as conn:
         # Import all models to ensure they're registered
-        from backend.app.infrastructure.database.models import User, Session, Equipment, EquipmentSettings
+        from app.infrastructure.database.models import User, Session, Equipment, EquipmentSettings
         await conn.run_sync(Base.metadata.create_all)
 
 

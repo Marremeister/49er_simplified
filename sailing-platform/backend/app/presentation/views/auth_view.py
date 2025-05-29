@@ -1,8 +1,8 @@
 """Authentication view for formatting auth responses."""
 from typing import Dict, Any
 
-from backend.app.domain.entities.user import User
-from backend.app.application.schemas.user_schemas import UserResponse, Token
+from app.domain.entities.user import User
+from app.application.schemas.user_schemas import UserResponse, Token
 
 
 class AuthView:

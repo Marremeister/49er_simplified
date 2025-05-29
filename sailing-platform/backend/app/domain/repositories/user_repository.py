@@ -3,8 +3,8 @@ from abc import abstractmethod
 from typing import Optional
 from uuid import UUID
 
-from backend.app.domain.entities.user import User
-from backend.app.domain.repositories.base import IRepository
+from app.domain.entities.user import User
+from app.domain.repositories.base import IRepository
 
 
 class IUserRepository(IRepository[User]):

@@ -1,8 +1,8 @@
 """Equipment view for formatting equipment responses."""
 from typing import List, Dict, Any
 
-from backend.app.domain.entities.equipment import Equipment
-from backend.app.application.schemas.equipment_schemas import (
+from app.domain.entities.equipment import Equipment
+from app.application.schemas.equipment_schemas import (
     EquipmentResponse,
     EquipmentStatistics
 )

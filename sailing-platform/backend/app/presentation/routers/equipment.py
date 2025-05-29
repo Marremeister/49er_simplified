@@ -4,20 +4,20 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 
-from backend.app.dependencies import get_equipment_service, get_current_user_id, get_session_service
-from backend.app.domain.services.equipment_service import EquipmentService
-from backend.app.domain.services.session_service import SessionService
-from backend.app.presentation.controllers.equipment_controller import EquipmentController
-from backend.app.presentation.views.equipment_view import EquipmentView
-from backend.app.presentation.controllers.session_controller import SessionController
-from backend.app.presentation.views.session_view import SessionView
-from backend.app.application.schemas.equipment_schemas import (
+from app.dependencies import get_equipment_service, get_current_user_id, get_session_service
+from app.domain.services.equipment_service import EquipmentService
+from app.domain.services.session_service import SessionService
+from app.presentation.controllers.equipment_controller import EquipmentController
+from app.presentation.views.equipment_view import EquipmentView
+from app.presentation.controllers.session_controller import SessionController
+from app.presentation.views.session_view import SessionView
+from app.application.schemas.equipment_schemas import (
     EquipmentCreate,
     EquipmentUpdate,
     EquipmentResponse,
     EquipmentStatistics
 )
-from backend.app.application.schemas.session_schemas import (
+from app.application.schemas.session_schemas import (
     EquipmentSettingsCreate,
     EquipmentSettingsResponse
 )
@@ -47,9 +47,9 @@ async def create_equipment(
 
 @router.get("/", response_model=List[EquipmentResponse])
 async def list_equipment(
-        active_only: bool = Query(True, description="Filter for active equipment only"),
         current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-        equipment_service: Annotated[EquipmentService, Depends(get_equipment_service)]
+        equipment_service: Annotated[EquipmentService, Depends(get_equipment_service)],
+        active_only: bool = Query(True, description="Filter for active equipment only"),
 ):
     """List all equipment for the current user."""
     controller = EquipmentController(equipment_service)

@@ -3,8 +3,8 @@ from typing import List, Optional, Dict, Any
 from datetime import date
 from uuid import UUID
 
-from backend.app.domain.services.session_service import SessionService
-from backend.app.application.schemas.session_schemas import (
+from app.domain.services.session_service import SessionService
+from app.application.schemas.session_schemas import (
     SessionCreate,
     SessionUpdate,
     EquipmentSettingsCreate

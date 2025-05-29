@@ -2,9 +2,9 @@
 from typing import Dict, Any
 from uuid import UUID
 
-from backend.app.domain.services.auth_service import AuthService
-from backend.app.infrastructure.security.jwt_handler import JWTHandler
-from backend.app.application.schemas.user_schemas import UserCreate, UserLogin
+from app.domain.services.auth_service import AuthService
+from app.infrastructure.security.jwt_handler import JWTHandler
+from app.application.schemas.user_schemas import UserCreate, UserLogin
 
 
 class AuthController:

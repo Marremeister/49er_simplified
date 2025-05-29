@@ -4,18 +4,18 @@ from typing import Annotated, Dict
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 
-from backend.app.dependencies import (
+from app.dependencies import (
     get_auth_service,
     get_jwt_handler,
     get_current_user,
     oauth2_scheme
 )
-from backend.app.domain.entities.user import User
-from backend.app.domain.services.auth_service import AuthService
-from backend.app.infrastructure.security.jwt_handler import JWTHandler
-from backend.app.presentation.controllers.auth_controller import AuthController
-from backend.app.presentation.views.auth_view import AuthView
-from backend.app.application.schemas.user_schemas import (
+from app.domain.entities.user import User
+from app.domain.services.auth_service import AuthService
+from app.infrastructure.security.jwt_handler import JWTHandler
+from app.presentation.controllers.auth_controller import AuthController
+from app.presentation.views.auth_view import AuthView
+from app.application.schemas.user_schemas import (
     UserCreate,
     UserResponse,
     Token,

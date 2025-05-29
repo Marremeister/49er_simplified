@@ -4,9 +4,9 @@ from typing import List, Optional
 from datetime import date
 from uuid import UUID
 
-from backend.app.domain.entities.session import SailingSession
-from backend.app.domain.entities.equipment import EquipmentSettings
-from backend.app.domain.repositories.base import IRepository
+from app.domain.entities.session import SailingSession
+from app.domain.entities.equipment import EquipmentSettings
+from app.domain.repositories.base import IRepository
 
 
 class ISessionRepository(IRepository[SailingSession]):

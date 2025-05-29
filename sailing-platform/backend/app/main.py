@@ -3,9 +3,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.app.config import settings
-from backend.app.infrastructure.database.connection import create_tables, close_database
-from backend.app.presentation.routers import auth, sessions, equipment
+from app.config import settings
+from app.infrastructure.database.connection import create_tables, close_database
+from app.presentation.routers import auth, sessions, equipment
 
 
 @asynccontextmanager

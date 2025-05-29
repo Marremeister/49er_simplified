@@ -1,9 +1,9 @@
 """Session view for formatting sailing session responses."""
 from typing import List, Dict, Any, Optional
 
-from backend.app.domain.entities.session import SailingSession
-from backend.app.domain.entities.equipment import EquipmentSettings
-from backend.app.application.schemas.session_schemas import (
+from app.domain.entities.session import SailingSession
+from app.domain.entities.equipment import EquipmentSettings
+from app.application.schemas.session_schemas import (
     SessionResponse,
     SessionWithSettingsResponse,
     EquipmentSettingsResponse,

@@ -6,21 +6,21 @@ from uuid import UUID
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
-#from jose import JWTError
+from jose import JWTError
 
-from backend.app.config import settings
-from backend.app.infrastructure.database.connection import get_db
-from backend.app.infrastructure.security.password_hasher import PasswordHasher, IPasswordHasher
-from backend.app.infrastructure.security.jwt_handler import JWTHandler
-from backend.app.infrastructure.database.repositories.user_repository_impl import UserRepository
-from backend.app.infrastructure.database.repositories.session_repository_impl import SessionRepository
-from backend.app.infrastructure.database.repositories.equipment_repository_impl import EquipmentRepository
-from backend.app.domain.repositories.user_repository import IUserRepository
-from backend.app.domain.repositories.session_repository import ISessionRepository
-from backend.app.domain.repositories.equipment_repository import IEquipmentRepository
-from backend.app.domain.services.auth_service import AuthService
-from backend.app.domain.services.session_service import SessionService
-from backend.app.domain.services.equipment_service import EquipmentService
+from app.config import settings
+from app.infrastructure.database.connection import get_db
+from app.infrastructure.security.password_hasher import PasswordHasher, IPasswordHasher
+from app.infrastructure.security.jwt_handler import JWTHandler
+from app.infrastructure.database.repositories.user_repository_impl import UserRepository
+from app.infrastructure.database.repositories.session_repository_impl import SessionRepository
+from app.infrastructure.database.repositories.equipment_repository_impl import EquipmentRepository
+from app.domain.repositories.user_repository import IUserRepository
+from app.domain.repositories.session_repository import ISessionRepository
+from app.domain.repositories.equipment_repository import IEquipmentRepository
+from app.domain.services.auth_service import AuthService
+from app.domain.services.session_service import SessionService
+from app.domain.services.equipment_service import EquipmentService
 
 # OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/token")

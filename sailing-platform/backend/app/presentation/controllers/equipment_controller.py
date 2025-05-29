@@ -2,8 +2,8 @@
 from typing import List, Dict, Any
 from uuid import UUID
 
-from backend.app.domain.services.equipment_service import EquipmentService
-from backend.app.application.schemas.equipment_schemas import (
+from app.domain.services.equipment_service import EquipmentService
+from app.application.schemas.equipment_schemas import (
     EquipmentCreate,
     EquipmentUpdate
 )

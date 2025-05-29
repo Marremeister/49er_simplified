@@ -3,8 +3,8 @@ from typing import List, Optional, Dict, Any
 from uuid import UUID
 from collections import defaultdict
 
-from backend.app.domain.entities.equipment import Equipment, EquipmentType
-from backend.app.domain.repositories.equipment_repository import IEquipmentRepository
+from app.domain.entities.equipment import Equipment, EquipmentType
+from app.domain.repositories.equipment_repository import IEquipmentRepository
 
 
 class EquipmentService:

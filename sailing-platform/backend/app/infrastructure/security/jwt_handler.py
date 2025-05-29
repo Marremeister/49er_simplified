@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 from jose import JWTError, jwt
 
-from backend.app.config import settings
+from app.config import settings
 
 
 class JWTHandler:

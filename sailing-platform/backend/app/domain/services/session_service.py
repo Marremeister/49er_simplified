@@ -4,9 +4,9 @@ from datetime import date
 from uuid import UUID
 from collections import defaultdict
 
-from backend.app.domain.entities.session import SailingSession
-from backend.app.domain.entities.equipment import EquipmentSettings
-from backend.app.domain.repositories.session_repository import ISessionRepository
+from app.domain.entities.session import SailingSession
+from app.domain.entities.equipment import EquipmentSettings
+from app.domain.repositories.session_repository import ISessionRepository
 
 
 class SessionService:

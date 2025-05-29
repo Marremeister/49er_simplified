@@ -5,11 +5,11 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 
-from backend.app.dependencies import get_session_service, get_current_user_id
-from backend.app.domain.services.session_service import SessionService
-from backend.app.presentation.controllers.session_controller import SessionController
-from backend.app.presentation.views.session_view import SessionView
-from backend.app.application.schemas.session_schemas import (
+from app.dependencies import get_session_service, get_current_user_id
+from app.domain.services.session_service import SessionService
+from app.presentation.controllers.session_controller import SessionController
+from app.presentation.views.session_view import SessionView
+from app.application.schemas.session_schemas import (
     SessionCreate,
     SessionUpdate,
     SessionResponse,
@@ -44,10 +44,10 @@ async def create_session(
 
 @router.get("/", response_model=List[SessionResponse])
 async def list_sessions(
-        skip: int = Query(0, ge=0),
-        limit: int = Query(100, ge=1, le=100),
         current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-        session_service: Annotated[SessionService, Depends(get_session_service)]
+        session_service: Annotated[SessionService, Depends(get_session_service)],
+        skip: int = Query(0, ge=0),
+        limit: int = Query(100, ge=1, le=100)
 ):
     """List all sessions for the current user."""
     controller = SessionController(session_service)
@@ -59,10 +59,10 @@ async def list_sessions(
 
 @router.get("/analytics/performance", response_model=PerformanceAnalytics)
 async def get_performance_analytics(
-        start_date: Optional[date] = Query(None),
-        end_date: Optional[date] = Query(None),
         current_user_id: Annotated[UUID, Depends(get_current_user_id)],
-        session_service: Annotated[SessionService, Depends(get_session_service)]
+        session_service: Annotated[SessionService, Depends(get_session_service)],
+        start_date: Optional[date] = Query(None),
+        end_date: Optional[date] = Query(None)
 ):
     """Get performance analytics for user sessions."""
     controller = SessionController(session_service)

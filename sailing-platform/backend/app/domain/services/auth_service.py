@@ -2,9 +2,9 @@
 from typing import Optional
 from uuid import UUID
 
-from backend.app.domain.entities.user import User
-from backend.app.domain.repositories.user_repository import IUserRepository
-from backend.app.infrastructure.security.password_hasher import IPasswordHasher
+from app.domain.entities.user import User
+from app.domain.repositories.user_repository import IUserRepository
+from app.infrastructure.security.password_hasher import IPasswordHasher
 
 
 class AuthService:

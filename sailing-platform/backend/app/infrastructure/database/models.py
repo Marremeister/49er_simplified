@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 import uuid
 import enum
 
-from backend.app.infrastructure.database.connection import Base
+from app.infrastructure.database.connection import Base
 
 
 # Enums for database
