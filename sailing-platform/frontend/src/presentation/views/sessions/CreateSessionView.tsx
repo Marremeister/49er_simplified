@@ -1,3 +1,4 @@
+// src/presentation/views/sessions/CreateSessionView.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
@@ -26,6 +27,7 @@ const createSessionSchema = z.object({
   performance_rating: z.number().min(1).max(5),
   notes: z.string().max(1000, 'Notes are too long').optional(),
   equipment_ids: z.array(z.string()).optional(),
+  add_settings_after: z.boolean().optional(),
 }).refine((data) => data.wind_speed_min <= data.wind_speed_max, {
   message: 'Minimum wind speed cannot exceed maximum',
   path: ['wind_speed_min'],
@@ -60,6 +62,7 @@ export const CreateSessionView: React.FC = () => {
       performance_rating: 3,
       notes: '',
       equipment_ids: [],
+      add_settings_after: false,
     },
   });
 
@@ -74,8 +77,14 @@ export const CreateSessionView: React.FC = () => {
         equipment_ids: data.equipment_ids || [],
       };
 
-      await createSession(dto);
-      navigate('/sessions');
+      const newSession = await createSession(dto);
+
+      // Navigate based on user preference
+      if (data.add_settings_after && data.equipment_ids && data.equipment_ids.length > 0) {
+        navigate(`/sessions/${newSession.id}/settings`);
+      } else {
+        navigate(`/sessions/${newSession.id}`);
+      }
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Failed to create session');
     } finally {
@@ -106,6 +115,17 @@ export const CreateSessionView: React.FC = () => {
               {submitError}
             </div>
           )}
+
+          {/* Info Box */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h4 className="text-sm font-medium text-blue-900 mb-1">
+              Two-Step Process
+            </h4>
+            <p className="text-sm text-blue-700">
+              1. Create your session with basic info and equipment used<br/>
+              2. Add detailed rig settings (tensions, sail controls) in the next step
+            </p>
+          </div>
 
           {/* Basic Info */}
           <div className="space-y-4">
@@ -271,28 +291,75 @@ export const CreateSessionView: React.FC = () => {
               <Controller
                 name="equipment_ids"
                 control={control}
+                render={({ field: { value, onChange } }) => {
+                  // Group equipment by type
+                  const equipmentByType = activeEquipment.reduce((acc, item) => {
+                    const type = item.type;
+                    if (!acc[type]) acc[type] = [];
+                    acc[type].push(item);
+                    return acc;
+                  }, {} as Record<string, typeof activeEquipment>);
+
+                  return (
+                    <div className="space-y-4">
+                      {Object.entries(equipmentByType).map(([type, items]) => (
+                        <div key={type} className="space-y-2">
+                          <h4 className="text-sm font-medium text-gray-700">{type}</h4>
+                          <div className="ml-4 space-y-2">
+                            {items.map((item) => (
+                              <label key={item.id} className="flex items-start space-x-3 hover:bg-gray-50 p-2 rounded">
+                                <input
+                                  type="checkbox"
+                                  value={item.id}
+                                  checked={value?.includes(item.id) || false}
+                                  onChange={(e) => {
+                                    const updatedIds = e.target.checked
+                                      ? [...(value || []), item.id]
+                                      : (value || []).filter(id => id !== item.id);
+                                    onChange(updatedIds);
+                                  }}
+                                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-0.5"
+                                />
+                                <div className="flex-1">
+                                  <p className="text-sm font-medium">{item.name}</p>
+                                  <p className="text-xs text-gray-600">
+                                    {item.manufacturer} {item.model} • {item.wear.toFixed(1)}h wear
+                                  </p>
+                                </div>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                }}
+              />
+              <p className="text-sm text-gray-500 italic">
+                Equipment wear hours will be automatically updated based on session duration
+              </p>
+
+              {/* Add Settings Option */}
+              <Controller
+                name="add_settings_after"
+                control={control}
                 render={({ field: { value, onChange } }) => (
-                  <div className="space-y-2">
-                    {activeEquipment.map((item) => (
-                      <label key={item.id} className="flex items-center space-x-3">
-                        <input
-                          type="checkbox"
-                          value={item.id}
-                          checked={value?.includes(item.id) || false}
-                          onChange={(e) => {
-                            const updatedIds = e.target.checked
-                              ? [...(value || []), item.id]
-                              : (value || []).filter(id => id !== item.id);
-                            onChange(updatedIds);
-                          }}
-                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                        />
-                        <span className="text-sm">
-                          {item.name} ({item.type})
-                        </span>
-                      </label>
-                    ))}
-                  </div>
+                  <label className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg border border-blue-200 cursor-pointer hover:bg-blue-100">
+                    <input
+                      type="checkbox"
+                      checked={value || false}
+                      onChange={(e) => onChange(e.target.checked)}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-blue-900">
+                        Add equipment settings after creating session
+                      </p>
+                      <p className="text-xs text-blue-700">
+                        Record detailed rig tensions and sail controls for this session
+                      </p>
+                    </div>
+                  </label>
                 )}
               />
             </div>

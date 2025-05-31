@@ -12,7 +12,9 @@ import { RegisterView } from '../views/auth/RegisterView';
 import { DashboardView } from '../views/dashboard/DashboardView';
 import { SessionsListView } from '../views/sessions/SessionsListView';
 import { CreateSessionView } from '../views/sessions/CreateSessionView';
+import { SessionDetailView } from '../views/sessions/SessionDetailView';
 import { SessionAnalyticsView } from '../views/sessions/SessionAnalyticsView';
+import { EquipmentSettingsForm } from '../views/sessions/EquipmentSettingsForm';
 import { EquipmentListView } from '../views/equipment/EquipmentListView';
 import { CreateEquipmentView } from '../views/equipment/CreateEquipmentView';
 
@@ -42,6 +44,10 @@ export const AppRouter: React.FC = () => {
           <Route path="/sessions" element={<SessionsListView />} />
           <Route path="/sessions/new" element={<CreateSessionView />} />
           <Route path="/sessions/analytics" element={<SessionAnalyticsView />} />
+          <Route path="/sessions/:id" element={<SessionDetailView />} />
+          <Route path="/sessions/:id/edit" element={<CreateSessionView />} />
+          <Route path="/sessions/:sessionId/settings" element={<EquipmentSettingsForm />} />
+          <Route path="/sessions/:sessionId/settings/edit" element={<EquipmentSettingsForm />} />
 
           {/* Equipment */}
           <Route path="/equipment" element={<EquipmentListView />} />

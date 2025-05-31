@@ -76,4 +76,8 @@ export class Session implements ISession {
 
     return conditions.join(' • ');
   }
+
+  hasEquipment(): boolean {
+    return this.equipmentIds.length > 0;
+  }
 }
