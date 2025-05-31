@@ -43,12 +43,19 @@ class APIClient {
             const response = await fetch(url, config);
             clearTimeout(timeoutId);
 
+            // Handle 204 No Content
+            if (response.status === 204) {
+                return null;
+            }
+
             // Handle response
-            const data = await response.json();
+            const data = response.ok && response.headers.get('content-type')?.includes('application/json')
+                ? await response.json()
+                : null;
 
             if (!response.ok) {
                 throw new APIError(
-                    data.detail || 'An error occurred',
+                    data?.detail || 'An error occurred',
                     response.status,
                     data
                 );
@@ -199,6 +206,10 @@ const API = {
             return API.client.post(`/sessions/${sessionId}/settings`, data);
         },
 
+        async getEquipment(sessionId) {
+            return API.client.get(`/sessions/${sessionId}/equipment`);
+        },
+
         async getPerformanceAnalytics(params = {}) {
             return API.client.get('/sessions/analytics/performance', params);
         }
@@ -265,7 +276,7 @@ const API = {
                 // Fallback values if schema fetch fails
                 const fallbacks = {
                     'WaveType': ['Flat', 'Choppy', 'Medium', 'Large'],
-                    'EquipmentType': ['Mainsail', 'Jib', 'Mast', 'Boom', 'Rudder', 'Centerboard', 'Other'],
+                    'EquipmentType': ['Mainsail', 'Jib', 'Gennaker', 'Mast', 'Boom', 'Rudder', 'Centerboard', 'Other'],
                     'TensionLevel': ['Loose', 'Medium', 'Tight']
                 };
 
