@@ -37,5 +37,3 @@ export const setupInterceptors = (axiosInstance: AxiosInstance): void => {
     }
   );
 };
-
-}
